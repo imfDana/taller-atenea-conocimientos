@@ -12,6 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  // Directory containing test files
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -31,25 +32,41 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
 
+    // Run tests in headless mode (no browser UI)
     headless: true,
   },
 
   /* Configure projects for major browsers */
   projects: [
+
+    // Setup project: runs authentication and data preparation before tests
+    {
+      name: 'setup',
+      // use: { ...devices['Desktop Chrome'] },
+      // testDir: './tests/auth',
+      // Only run files matching *.setup.ts pattern
+      testMatch: /.*\.setup\.ts/,
+
+    },
+
+    // Main test project: runs on Chromium browser
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      // Wait for setup project to complete before running
+      dependencies: ['setup'],
     },
 
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'] },
+    // },
+
 
     /* Test against mobile viewports. */
     // {

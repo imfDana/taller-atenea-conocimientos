@@ -1,8 +1,10 @@
 import { Page, Locator } from '@playwright/test';
-import TestData  from '../data/testData.json';
+import TestData from '../data/testData.json';
 
+// Page Object Model for Registration page
 export class RegisterPage {
     readonly page: Page;
+    // Registration form elements
     readonly firstNameInput: Locator;
     readonly lastNameInput: Locator;
     readonly emailInput: Locator;
@@ -10,6 +12,7 @@ export class RegisterPage {
     readonly registerButton: Locator;
     readonly loginButton: Locator;
 
+    // Initialize page elements using locators
     constructor(page: Page) {
         this.page = page;
         this.firstNameInput = page.locator('input[name="firstName"]');
@@ -20,23 +23,27 @@ export class RegisterPage {
         this.loginButton = page.getByTestId('boton-login-header-signup');
     }
 
+    // Navigate to registration page (home page)
     async visitRegisterPage() {
         await this.page.goto('http://localhost:3000/');
         await this.page.waitForLoadState('networkidle');
     }
 
-    async fillRegistrationForm( user: {firstName: string, lastName: string, email: string, password: string}) {
+    // Fill all registration form fields
+    async fillRegistrationForm(user: { firstName: string, lastName: string, email: string, password: string }) {
         await this.firstNameInput.fill(user.firstName);
         await this.lastNameInput.fill(user.lastName);
         await this.emailInput.fill(user.email);
         await this.passwordInput.fill(user.password);
     }
 
+    // Click the register button
     async makeClickOnRegisterButton() {
         await this.registerButton.click();
     }
 
-    async completeFormAndRegister(user: {firstName: string, lastName: string, email: string, password: string}) {
+    // Complete registration process: fill form and submit
+    async completeFormAndRegister(user: { firstName: string, lastName: string, email: string, password: string }) {
         await this.fillRegistrationForm(user);
         await this.makeClickOnRegisterButton();
     }
