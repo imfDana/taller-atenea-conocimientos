@@ -39,8 +39,9 @@ setup('TC-03 Create sender user with account', async ({ page, request }) => {
 
 });
 
-setup('TC-04 Login with the receiver user', async ({ page, request }) => {
-    await loginPage.completeLogin(TestData.validUser);
+setup('TC-04 Create and login with the receiver user', async ({ page, request }) => {
+    const newUser = await BackendUtils.createUserByAPI(request, TestData.validUser, false);
+    await loginPage.completeLogin(newUser);
     await expect(dashboardPage.dashboardTitle).toBeVisible();
     // Save authentication state for receiver user
     await page.context().storageState({ path: receiverAuthFile });
