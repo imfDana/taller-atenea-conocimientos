@@ -74,3 +74,17 @@ jobs:
       - name: Wait for frontend to be ready
         run: wait-on http://localhost:3000
 
+      # Run tests
+      - name: Install and run tests
+        run: |
+          cd tests
+          npm install
+          npx playwright install
+          npx playwright test ---reporter=html
+      
+      - name: Save reports as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: ./playwright-report
