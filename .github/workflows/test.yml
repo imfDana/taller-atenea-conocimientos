@@ -80,7 +80,7 @@ jobs:
           cd tests
           npm install
           npx playwright install --with-deps
-          npx playwright test ---reporter=html
+          npx playwright test --reporter=html
       
       - name: Save reports as artifact
         if: always()
