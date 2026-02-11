@@ -63,6 +63,13 @@ jobs:
         env:
           VITE_API_URL: ${{ env.VITE_API_URL }}
 
+      - name: Start frontend
+        run: |
+          cd app/frontend
+          npm run dev > frontend.log 2>&1 &
+        env:
+          VITE_API_URL: ${{ env.VITE_API_URL }}
+
       # Wait for frontend to be ready before running tests
       - name: Wait for frontend to be ready
         run: wait-on http://localhost:3000
