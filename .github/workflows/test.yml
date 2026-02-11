@@ -77,7 +77,10 @@ jobs:
       # Run tests
       - name: Install and run tests
         run: |
-          cd tests
+          mkdir -p playwright/.auth
+          echo "{}" > playwright/.auth/sender.json
+          echo "{}" > playwright/.auth/receiver.json
+          echo "{}" > playwright/.auth/sender.data.json
           npm install
           npx playwright install --with-deps
           npx playwright test --reporter=html
