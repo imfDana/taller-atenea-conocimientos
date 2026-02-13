@@ -33,7 +33,7 @@ senderTest('TC-14 Sending money via UI as a sender user', async ({ page }) => {
     await page.waitForTimeout(5000);
 });
 
-receiverTest('TC-15 Receiver sees the incoming transaction', async ({ page }) => {
+receiverTest('TC-15 Receiver sees the incoming transaction in the UI', async ({ page }) => {
     await expect(dashboardPage.dashboardTitle).toBeVisible();
     await expect(page.getByText(/Transferencia de/i).first()).toBeVisible();
 });
