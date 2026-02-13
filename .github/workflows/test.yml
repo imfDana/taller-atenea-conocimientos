@@ -99,6 +99,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           # clone gh-pages branch to temporary directory
+
           cd $RUNNER_TEMP
           git clone --depth=1 --branch=gh-pages https://x-access-token:${{ secrets.GH_PAGES_PAT }}@github.com/${{ github.repository }} gh-pages
           cd gh-pages
@@ -115,7 +116,8 @@ jobs:
           git commit -m "Playwright report - Run ${GITHUB_RUN_NUMBER}"
           git push origin gh-pages
 
-      - name: Print gh-pages branch URL
+      - name: Print report link in console
+        if: always()
         run: |
           echo "View the report at: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/report-${{github.run_number}}/"
 
