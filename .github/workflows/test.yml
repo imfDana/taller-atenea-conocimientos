@@ -91,3 +91,12 @@ jobs:
         with:
           name: playwright-report
           path: ./playwright-report
+      
+      - name: Deploy reports to GitHub Pages
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+
+            
