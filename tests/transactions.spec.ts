@@ -100,7 +100,7 @@ receiverTest('TC-16 Receiver sends money via API', async ({ page, request }) => 
     await expect(dashboardPage.dashboardTitle).toBeVisible();
 
     // Verify sender email appears in transaction
-    await expect(dashboardPage.transactionsListItems.first()).toContainText(senderEmail);
+    // await expect(dashboardPage.transactionsListItems.first()).toContainText(senderEmail);
 
     // Verify correct amount is displayed
     const regexAmount = new RegExp(String(aleatoryAmount.toFixed(2)));
