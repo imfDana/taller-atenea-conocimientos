@@ -38,8 +38,14 @@ senderTest('TC-14 Sending money via UI as a sender user', async ({ page }) => {
 });
 
 receiverTest('TC-15 Receiver sees the incoming transaction in the UI', async ({ page }) => {
+    // Load sender user data from file
+    const senderData = require.resolve('../playwright/.auth/sender.data.json');
+    const senderDataContent = await fs.readFile(senderData, 'utf-8');
+    const dataSenderUser = JSON.parse(senderDataContent);
+    const senderEmail = dataSenderUser.email;
+
     await expect(dashboardPage.dashboardTitle).toBeVisible();
-    await expect(page.getByText('Transferencia de email').first()).toBeVisible();
+    await expect(page.getByText('Transferencia de ' + senderEmail).first()).toBeVisible();
 });
 
 
