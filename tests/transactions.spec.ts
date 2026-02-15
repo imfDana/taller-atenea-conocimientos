@@ -26,16 +26,20 @@ test.beforeEach(async ({ page }) => {
 });
 
 senderTest('TC-14 Sending money via UI as a sender user', async ({ page }) => {
+
+    senderTest.info().annotations.push({
+        type: 'Receiver user information',
+        description: TestData.validUser.email
+    })
     await expect(dashboardPage.dashboardTitle).toBeVisible();
     await dashboardPage.sentMoneyBtn.click();
     await sentMoneyModal.completeSendMoneyProcess(TestData.validUser.email, '100');
     await expect(page.getByText('Transferencia enviada a ' + TestData.validUser.email)).toBeVisible();
-    await page.waitForTimeout(5000);
 });
 
 receiverTest('TC-15 Receiver sees the incoming transaction in the UI', async ({ page }) => {
     await expect(dashboardPage.dashboardTitle).toBeVisible();
-    await expect(page.getByText(/Transferencia de/i).first()).toBeVisible();
+    await expect(page.getByText('Transferencia de email').first()).toBeVisible();
 });
 
 
