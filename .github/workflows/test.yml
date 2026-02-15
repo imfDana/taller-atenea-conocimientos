@@ -23,7 +23,7 @@ jobs:
       VITE_API_URL: http://localhost:6007/api
 
     steps:
-      - name: Checkout current repo (with workflow files)
+      - name: Checkout current repo (with the workflow files)
         uses: actions/checkout@v3
 
       - name: Clone repo Athena Redux Bank
