@@ -1,9 +1,0 @@
-{
-  "validUser": {
-    "id": 1,
-    "firstName": "Dana",
-    "lastName": "Imfeld",
-    "email": "valid@email.com",
-    "password": "Curs0deTesting"
-  }
-}
