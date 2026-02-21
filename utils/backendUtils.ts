@@ -4,11 +4,16 @@ import { APIRequestContext, Page, expect, request } from '@playwright/test';
 export class BackendUtils {
 
     // Create a new user via API with unique email
-    static async createUserByAPI(request: APIRequestContext, user: any) {
+    static async createUserByAPI(request: APIRequestContext, user: any, isNew: boolean = true) {
 
         // Generate unique email using timestamp
-        const email = (user.email.split('@')[0] + Date.now().toString() + '@' + user.email.split('@')[1]);
+        let email: string;
 
+        if (isNew) {
+            email = (user.email.split('@')[0] + Date.now().toString() + '@' + user.email.split('@')[1]);
+        } else {
+            email = user.email;
+        }
         // Make POST request to signup endpoint
         const response = await request.post('http://localhost:6007/api/auth/signup', {
             headers: {

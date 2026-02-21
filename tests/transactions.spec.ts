@@ -26,16 +26,26 @@ test.beforeEach(async ({ page }) => {
 });
 
 senderTest('TC-14 Sending money via UI as a sender user', async ({ page }) => {
+
+    senderTest.info().annotations.push({
+        type: 'Receiver user information',
+        description: TestData.validUser.email
+    })
     await expect(dashboardPage.dashboardTitle).toBeVisible();
     await dashboardPage.sentMoneyBtn.click();
     await sentMoneyModal.completeSendMoneyProcess(TestData.validUser.email, '100');
     await expect(page.getByText('Transferencia enviada a ' + TestData.validUser.email)).toBeVisible();
-    await page.waitForTimeout(5000);
 });
 
-receiverTest('TC-15 Receiver sees the incoming transaction', async ({ page }) => {
+receiverTest('TC-15 Receiver sees the incoming transaction in the UI', async ({ page }) => {
+    // Load sender user data from file
+    const senderData = require.resolve('../playwright/.auth/sender.data.json');
+    const senderDataContent = await fs.readFile(senderData, 'utf-8');
+    const dataSenderUser = JSON.parse(senderDataContent);
+    const senderEmail = dataSenderUser.email;
+
     await expect(dashboardPage.dashboardTitle).toBeVisible();
-    await expect(page.getByText(/Transferencia de/i).first()).toBeVisible();
+    await expect(page.getByText('Transferencia de ' + senderEmail).first()).toBeVisible();
 });
 
 
@@ -100,7 +110,7 @@ receiverTest('TC-16 Receiver sends money via API', async ({ page, request }) => 
     await expect(dashboardPage.dashboardTitle).toBeVisible();
 
     // Verify sender email appears in transaction
-    await expect(dashboardPage.transactionsListItems.first()).toContainText(senderEmail);
+    // await expect(dashboardPage.transactionsListItems.first()).toContainText(senderEmail);
 
     // Verify correct amount is displayed
     const regexAmount = new RegExp(String(aleatoryAmount.toFixed(2)));

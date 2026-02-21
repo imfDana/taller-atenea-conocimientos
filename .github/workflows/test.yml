@@ -1,0 +1,127 @@
+name: CI - cloning app and running tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
+    env:
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      PORT: 6007
+      VITE_API_URL: http://localhost:6007/api
+
+    steps:
+      - name: Checkout current repo (with the workflow files)
+        uses: actions/checkout@v3
+
+      - name: Clone repo Athena Redux Bank
+        run: |
+          git clone https://github.com/imfDana/redux-athena-bank.git app
+
+      - name: Create backend .env files
+        run: |
+          echo "MONGO_URI=${{ env.MONGO_URI }}" > app/backend/.env
+          echo "JWT_SECRET=${{ env.JWT_SECRET }}" >> app/backend/.env
+          echo "PORT=${{ env.PORT }}" >> app/backend/.env
+          echo "VITE_API_URL=${{ env.VITE_API_URL }}" >> app/backend/.env
+
+      - name: Install backend dependencies
+        run: |
+          cd app/backend
+          npm install
+
+      - name: Start backend
+        run: |
+          cd app/backend
+          npm run dev > backend.log 2>&1 &
+
+      # Install wait-on tool globally
+      - name: Install wait-on
+        run: npm install -g wait-on
+
+      # Wait for backend to be ready before running tests
+      - name: Wait for backend to be ready
+        run: wait-on tcp:6007
+
+      # Install frontend dependencies
+      - name: Install frontend dependencies
+        run: |
+          cd app/frontend
+          npm install
+        env:
+          VITE_API_URL: ${{ env.VITE_API_URL }}
+
+      - name: Start frontend
+        run: |
+          cd app/frontend
+          npm run dev > frontend.log 2>&1 &
+        env:
+          VITE_API_URL: ${{ env.VITE_API_URL }}
+
+      # Wait for frontend to be ready before running tests
+      - name: Wait for frontend to be ready
+        run: wait-on http://localhost:3000
+
+      # Run tests
+      - name: Install and run tests
+        run: |
+          mkdir -p playwright/.auth
+          echo "{}" > playwright/.auth/sender.json
+          echo "{}" > playwright/.auth/receiver.json
+          echo "{}" > playwright/.auth/sender.data.json
+          npm install
+          npx playwright install --with-deps
+          npx playwright test --reporter=html
+      
+      - name: Save reports as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: ./playwright-report
+      
+      - name: Deploy Playwright report to GitHub Pages
+        if: always()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # clone gh-pages branch to temporary directory
+
+          cd $RUNNER_TEMP
+          git clone --depth=1 --branch=gh-pages https://x-access-token:${{ secrets.GH_PAGES_PAT }}@github.com/${{ github.repository }} gh-pages
+          cd gh-pages
+
+          # clean old content
+          rm -rf ./*
+
+          # copy new content into the report
+          mkdir -p report-${GITHUB_RUN_NUMBER}
+          cp -r $GITHUB_WORKSPACE/playwright-report/* ./report-${GITHUB_RUN_NUMBER}/
+
+          # commit and push changes
+          git add .
+          git commit -m "Playwright report - Run ${GITHUB_RUN_NUMBER}"
+          git push origin gh-pages
+
+      - name: Print report link in console
+        if: always()
+        run: |
+          echo "View the report at: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/report-${{github.run_number}}/"
+
+
+
+
+            

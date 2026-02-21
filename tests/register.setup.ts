@@ -39,8 +39,14 @@ setup('TC-03 Create sender user with account', async ({ page, request }) => {
 
 });
 
-setup('TC-04 Login with the receiver user', async ({ page, request }) => {
-    await loginPage.completeLogin(TestData.validUser);
+setup('TC-04 Create and login with the receiver user', async ({ page, request }) => {
+    const newUser = await BackendUtils.createUserByAPI(request, TestData.validUser, false);
+    await loginPage.completeLogin(newUser);
+    await dashboardPage.addAccountBtn.click();
+    await createAccountModal.selectAccountType('Débito');
+    await createAccountModal.completeAmountInput('1000');
+    await createAccountModal.createAccountBtn.click();
+    await expect(page.getByText('¡Cuenta creada exitosamente!')).toBeVisible();
     await expect(dashboardPage.dashboardTitle).toBeVisible();
     // Save authentication state for receiver user
     await page.context().storageState({ path: receiverAuthFile });
